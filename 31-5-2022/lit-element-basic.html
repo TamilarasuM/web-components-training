@@ -31,7 +31,7 @@
             render() {
                 return html` <h3>${todoheading}</h3> 
                 <ol>
-                    ${this.todos.map((data) => html`<li>${data.text} - ${data.finished ? 'Finished' : 'Unfinished'}</li>`)}
+                    ${this.todos.map((data) => html`<li style=color:${data.finished ? 'green' : 'red'}>${data.text} - ${data.finished ? 'Finished' : 'Unfinished'}</li>`)}
                 </ol>    
                 `;
             }
