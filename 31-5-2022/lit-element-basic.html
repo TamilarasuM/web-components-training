@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+    <custom-element>
+    </custom-element>
+    <template>
+        <style>
+            h1 {
+                color: red;
+            }
+        </style>
+        <h1>Template Element - attached to Custom elements! - "test-element"</h1>
+    </template>
+
+    <script type="module">
+        import { LitElement, html } from 'https://unpkg.com/lit-element?module';
+
+        class customElement extends LitElement {
+            render() {
+                return html` <h1>Todo app</h1> `;
+            }
+        }
+
+        customElements.define('custom-element', customElement);
+    </script>
+</body>
+
+</html>
