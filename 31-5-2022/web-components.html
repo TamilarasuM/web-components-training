@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+
+<html>
+
+<body>
+    <cool-heading>
+        <h1> Custom Elements - "cool-heading"</h1>
+    </cool-heading>
+
+    <test-element>
+    </test-element>
+
+    <template>
+        <style>
+            h1 {
+                color: red;
+            }
+        </style>
+        <h1>Template Element - attached to Custom elements! - "test-element"</h1>
+    </template>
+
+    <script>
+        class TestElements extends HTMLElement {
+            constructor() {
+                super();
+                const template = document.querySelector('template');
+                const clone = document.importNode(template.content, true);
+                this.attachShadow({ mode: 'open' });
+                this.shadowRoot.appendChild(clone);
+            }
+            connectedCallback() {
+                alert('Test element connected!');
+            }
+        }
+        class CoolHeading extends HTMLElement {
+            connectedCallback() {
+                alert('cool heading connected!');
+            }
+        }
+        customElements.define("test-element", TestElements)
+        customElements.define('cool-heading', CoolHeading);
+    </script>
+</body>
+
+</html>
