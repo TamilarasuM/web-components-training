@@ -4,26 +4,42 @@
 <body>
     <custom-element>
     </custom-element>
-    <template>
-        <style>
-            h1 {
-                color: red;
-            }
-        </style>
-        <h1>Template Element - attached to Custom elements! - "test-element"</h1>
-    </template>
+
+    <todo-app>
+    </todo-app>
 
     <script type="module">
         import { LitElement, html } from 'https://unpkg.com/lit-element?module';
+        let template = `Hello world - simple custom Element 1`;
+        let todoheading = "Todo App - building elemets dynamically";
 
         class customElement extends LitElement {
             render() {
-                return html` <h1>Todo app</h1> `;
+                return html` <h5>${template}</h5> `;
             }
         }
 
+        class TodoAPP extends LitElement {
+            constructor() {
+                super();
+                this.todos = [
+                    { text: 'A', finished: true },
+                    { text: 'B', finished: false },
+                    { text: 'C', finished: false },
+                ];
+            }
+            render() {
+                return html` <h3>${todoheading}</h3> 
+                <ol>
+                    ${this.todos.map((data) => html`<li>${data.text} - ${data.finished ? 'Finished' : 'Unfinished'}</li>`)}
+                </ol>    
+                `;
+            }
+        }
+        customElements.define('todo-app', TodoAPP);
         customElements.define('custom-element', customElement);
     </script>
+
 </body>
 
 </html>
