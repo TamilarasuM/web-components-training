@@ -11,9 +11,14 @@
     <todo-app-stage2>
     </todo-app-stage2>
 
+    <h3>Stage: 3</h3>
+    <todo-app-stage3>
+    </todo-app-stage3>
+
     <script type="module">
         import { LitElement, html } from 'https://unpkg.com/lit-element?module';
         let todoheading = "Todo App - building elements dynamically";
+        //Stage 1:
         class TodoAPP extends LitElement {
             constructor() {
                 super();
@@ -47,7 +52,68 @@
 
         //Stage 2
         class TodoAPP1 extends LitElement {
+            static get properties() {
+                return {
+                    todos: { type: Array },
+                };
+            }
 
+            constructor() {
+                super();
+                this.todos = [
+                    { text: 'event binding', finished: true },
+                    { text: 'looping', finished: false },
+                    { text: 'styling', finished: true },
+                ];
+            }
+            render() {
+                return html`
+                <h3>${todoheading} - Remove added - reactive property used</h3> 
+                 <input id="addTodoInput" placeholder="Name" />
+                 <button @click=${this.addNewItem}>Add</button>
+                 <button @click=${this.removeItem}>X</button>
+                <ul>
+                    ${this.todos.map((data) => html`<li style=color:${data.finished ? 'green' : 'red'}>  
+                     <input type="checkbox" .checked=${data.finished} @change = ${e => this.changeTodoStatus(e, data)}/>
+                       ${data.text} - ${data.finished ? 'Finished' : 'Unfinished'}
+                       </li>`)
+                    }
+                </ul>    
+                `;
+            }
+
+            addNewItem() {
+                const input = this.shadowRoot.getElementById('addTodoInput');
+                const inputText = input.value == '' ? "(empty)" : input.value;
+                input.value = '';
+                this.todos = [...this.todos, { text: inputText, finished: false }];
+                // update dom lit elements 
+                // this.requestUpdate();
+            }
+            removeItem() {
+                const input = this.shadowRoot.getElementById('addTodoInput');
+                const inputText = input.value;
+                this.todos = this.todos.filter((args) => {
+                    return args.text.trim().indexOf(inputText.trim()) == -1;
+                });
+                input.value = '';
+                // update dom lit elements 
+                // this.requestUpdate();
+            }
+            changeTodoStatus(e, data) {
+                const finished = e.target.checked;
+                const inputText = data.text;
+                this.todos = this.todos.map((args) => {
+                    if (args.text.trim() == (inputText.trim()))
+                        args.finished = finished;
+                    return args;
+                });
+            }
+        }
+
+
+        //Stage 3
+        class TodoAPP2 extends LitElement {
             static get properties() {
                 return {
                     todos: { type: Array },
@@ -64,15 +130,25 @@
             }
             render() {
 
+                const finishedCount = this.todos.filter(e => e.finished).length;
+                const unfinishedCount = this.todos.length - finishedCount;
+
+                let buildList = html`<ul> ${this.todos.map((data) => html`<li style=color:${data.finished ? 'green' : 'red'}>  
+                     <input type="checkbox" .checked=${data.finished} @change = ${e => this.changeTodoStatus(e, data)}/>
+                       ${data.text} - ${data.finished ? 'Finished' : 'Unfinished'}
+                         <button @click=${e => this.removeListItem(data)} style="padding:2px">X</button>
+                       </li>`)
+                    }
+                </ul> `;
+
                 return html`
-                <h3>${todoheading}</h3> 
+                <h3>${todoheading} - remove all & remove individual item & No data avilable msg</h3> 
                  <input id="addTodoInput" placeholder="Name" />
                  <button @click=${this.addNewItem}>Add</button>
-                 <button @click=${this.removeItem}>X</button>
-                <ol>
-                    ${this.todos.map((data) => html`<li style=color:${data.finished ? 'green' : 'red'}>${data.text} - ${data.finished ? 'Finished' : 'Unfinished'}</li>`)
-                    }
-                </ol>    
+                 <button @click=${this.removeItem}>Remove All</button>
+                ${this.todos.length > 0 ? html`${buildList}` : html`<ul> No data avilable !! </ul>`}
+                <div>Total finished: ${finishedCount}</div>
+                <div>Total unfinished: ${unfinishedCount}</div>
                 `;
             }
 
@@ -84,7 +160,6 @@
                 // update dom lit elements 
                 // this.requestUpdate();
             }
-
             removeItem() {
                 const input = this.shadowRoot.getElementById('addTodoInput');
                 const inputText = input.value;
@@ -95,9 +170,31 @@
                 // update dom lit elements 
                 // this.requestUpdate();
             }
+            removeListItem(data) {
+                const inputText = data.text;
+                this.todos = this.todos.filter((args) => {
+                    return args.text.trim().indexOf(inputText.trim()) == -1;
+                });
+            }
+            changeTodoStatus(e, data) {
+                const finished = e.target.checked;
+                const inputText = data.text;
+                this.todos = this.todos.map((args) => {
+                    if (args.text.trim() == (inputText.trim()))
+                        args.finished = finished;
+                    return args;
+                });
+            }
         }
-        customElements.define('todo-app-stage2', TodoAPP1);
+
+
+
+
+
+
         customElements.define('todo-app', TodoAPP);
+        customElements.define('todo-app-stage2', TodoAPP1);
+        customElements.define('todo-app-stage3', TodoAPP2);
     </script>
 
 
