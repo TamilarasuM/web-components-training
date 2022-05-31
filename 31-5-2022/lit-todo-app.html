@@ -16,7 +16,7 @@
     </todo-app-stage3>
 
     <script type="module">
-        import { LitElement, html } from 'https://unpkg.com/lit-element?module';
+        import { LitElement, html, css } from 'https://unpkg.com/lit-element?module';
         let todoheading = "Todo App - building elements dynamically";
         //Stage 1:
         class TodoAPP extends LitElement {
@@ -114,6 +114,29 @@
 
         //Stage 3
         class TodoAPP2 extends LitElement {
+
+            static get styles() {
+                return css`
+                :host {
+                    color: red;
+                }
+
+                ul {
+                    list-style: none;
+                    padding: 0;
+                }
+
+                button {
+                    background-color: transparent;
+                }
+                .finished{
+                    color: green
+                }
+                .unfinished {
+                    color:red
+                }
+                `;
+            }
             static get properties() {
                 return {
                     todos: { type: Array },
@@ -133,7 +156,7 @@
                 const finishedCount = this.todos.filter(e => e.finished).length;
                 const unfinishedCount = this.todos.length - finishedCount;
 
-                let buildList = html`<ul> ${this.todos.map((data) => html`<li style=color:${data.finished ? 'green' : 'red'}>  
+                let buildList = html`<ul> ${this.todos.map((data) => html`<li class=${data.finished ? 'finished' : 'unfinished'}>  
                      <input type="checkbox" .checked=${data.finished} @change = ${e => this.changeTodoStatus(e, data)}/>
                        ${data.text} - ${data.finished ? 'Finished' : 'Unfinished'}
                          <button @click=${e => this.removeListItem(data)} style="padding:2px">X</button>
@@ -142,7 +165,7 @@
                 </ul> `;
 
                 return html`
-                <h3>${todoheading} - remove all & remove individual item & No data avilable msg</h3> 
+                <h3> Styling & remove all & remove individual item & No data avilable msg</h3> 
                  <input id="addTodoInput" placeholder="Name" />
                  <button @click=${this.addNewItem}>Add</button>
                  <button @click=${this.removeItem}>Remove All</button>
