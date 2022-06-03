@@ -2,14 +2,15 @@
 <html>
 
 <body>
-    <h3>Example 1:</h3>
+    <h3>Hands On:</h3>
     <todo-app-stage3>
     </todo-app-stage3>
 
     <script type="module">
         import { LitElement, html, css } from 'https://unpkg.com/lit-element?module';
-        let todoheading = "Todo App - parent - child communication (properties & custom event , featch https)";
+        import 'https://unpkg.com/@material/mwc-button?module';
 
+        let todoheading = "Todo App";
         //Stage 3
         class TodoAPP2 extends LitElement {
 
@@ -18,16 +19,9 @@
                 :host {
                     color: #F538A0;
                 }
-
-                ul {
-                    list-style: none;
-                    padding: 0;
-                }
-
                 button {
                     background-color: transparent;
                 }
-            
                 `;
             }
             static get properties() {
@@ -36,7 +30,6 @@
                     loading: { type: Boolean }
                 };
             }
-
             constructor() {
                 super();
                 this.todos = [];
@@ -52,27 +45,30 @@
                             args['finished'] = args.gender == "male" ? true : false;
                             args['text'] = args.name;
                             return args;
-                            this.loading = false;
                         });
+                        this.loading = false;
                     });
             }
             render() {
                 const finishedCount = this.todos.filter(e => e.finished).length;
                 const unfinishedCount = this.todos.length - finishedCount;
+                const buildList = html`<div class='mdc-card'><todo-list .todoList=${this.todos} @child-changeTodoStatus=${this._changeTodoStatus} @child-removeListItem=${this._removeListItem}></todo-list><div> `;
 
-                let buildList = html`<todo-list .todoList=${this.todos} @child-changeTodoStatus=${this.changeTodoStatus} @child-removeListItem=${this.removeListItem}></todo-list> `;
-                return html`
+                if (this.loading)
+                    return html`<loader-element></loader-element>`
+                return html`<learning-details></learning-details>
                 <h3> ${todoheading} </h3> 
                  <input id="addTodoInput" placeholder="Name" />
-                 <button @click=${this.addNewItem}>Add</button>
-                 <button @click=${this.removeItem}>Remove All</button>
+                 <button @click=${this._addNewItem}>Add</button>
+                 <button @click=${this._removeItem}>Remove All</button>
                   ${buildList}
                 <div>Total finished: ${finishedCount}</div>
                 <div>Total unfinished: ${unfinishedCount}</div>
+                
                 `;
             }
 
-            addNewItem() {
+            _addNewItem() {
                 const input = this.shadowRoot.getElementById('addTodoInput');
                 const inputText = input.value == '' ? "(empty)" : input.value;
                 input.value = '';
@@ -80,7 +76,7 @@
                 // update dom lit elements 
                 // this.requestUpdate();
             }
-            removeItem() {
+            _removeItem() {
                 const input = this.shadowRoot.getElementById('addTodoInput');
                 const inputText = input.value;
                 this.todos = this.todos.filter((args) => {
@@ -90,13 +86,13 @@
                 // update dom lit elements or we can use properties 
                 // this.requestUpdate();
             }
-            removeListItem(data) {
+            _removeListItem(data) {
                 const inputText = data.detail.text;
                 this.todos = this.todos.filter((args) => {
                     return args.text.trim().indexOf(inputText.trim()) == -1;
                 });
             }
-            changeTodoStatus(args) {
+            _changeTodoStatus(args) {
                 // values from child 
                 const finished = args.detail.e.target.checked;
                 const inputText = args.detail.data.text;
@@ -107,7 +103,6 @@
                 });
             }
         }
-        customElements.define('todo-app-stage3', TodoAPP2);
 
         class TodoAppList extends LitElement {
             static get properties() {
@@ -118,6 +113,22 @@
                 return css`
                 .finished { color:green;}
                 .unfinished { color:red;}
+                    ul {
+                    list-style: none;
+                    padding: 0;
+                }
+                
+                li {
+                    padding: 0.1em 0;
+                }
+                li button {
+                    font-size:10px;
+                }
+                .mdc-button {
+                    height:22px;
+                    width:22px;
+
+                }
                 `;
             }
             constructor() {
@@ -128,28 +139,27 @@
                 if (this.todoList.length == 0)
                     return html`<ul> No data avilable !! </ul>`
                 return html`<ul> ${this.todoList.map((data) => html`<li id=${data.text} class=${data.finished ? 'finished' : 'unfinished'}>  
-                     <input type="checkbox" for=${data.text} .checked=${data.finished} @change = ${e => this.changeTodoStatus(e, data)}/>
+                     <input type="checkbox" for=${data.text} .checked=${data.finished} @change = ${e => this._changeTodoStatus(e, data)}/>
                        ${data.text} - ${data.finished ? 'Finished' : 'Unfinished'}
-                         <button @click=${e => this.removeListItem(data)} style="padding:2px">X</button>
+                         <mwc-button @click=${e => this._removeListItem(data)} style="padding:2px">X</mwc-button>
                        </li>`)
                     }
                 </ul> `
             }
 
-            changeTodoStatus(e, data) {
+            _changeTodoStatus(e, data) {
                 //custom event to parent
                 this.dispatchEvent(new CustomEvent("child-changeTodoStatus", { detail: { e, data } }))
             }
-            removeListItem(data) {
+            _removeListItem(data) {
                 //custom event to parent
                 this.dispatchEvent(new CustomEvent("child-removeListItem", { detail: data }))
             }
         }
-        customElements.define('todo-list', TodoAppList);
 
 
-        class loadingIndicator extends LitElement {
 
+        class LoadingIndicator extends LitElement {
             render() {
                 return html`<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
                         width="200px" height="200px" viewBox="0 0 200 200" enable-background="new 0 0 200 200" xml:space="preserve">
@@ -177,6 +187,30 @@
 
             }
         }
+
+
+        class Learning extends LitElement {
+            constructor() {
+                super()
+                this.learnigList = ["Parent& child communication", "Properties", "Conditional rendering", "Custom events", "HTTP request", "Other web components"];
+            }
+
+            render() {
+                debugger
+                return html`<h3>Topics covered:</h3><ul> ${this.learnigList.map((data) => html`<li id=${data}>  
+                       ${data}
+                       </li>`)
+                    }
+                </ul> `
+            }
+        }
+
+        customElements.define('todo-app-stage3', TodoAPP2);
+        customElements.define('todo-list', TodoAppList);
+        customElements.define('loader-element', LoadingIndicator);
+        customElements.define('learning-details', Learning);
+
+
     </script>
 
 
