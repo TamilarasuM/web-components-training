@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+    <h3>Example 1:</h3>
+    <todo-app-stage3>
+    </todo-app-stage3>
+
+    <script type="module">
+        import { LitElement, html, css } from 'https://unpkg.com/lit-element?module';
+        let todoheading = "Todo App - parent - child communication (properties & custom event , featch https)";
+
+        //Stage 3
+        class TodoAPP2 extends LitElement {
+
+            static get styles() {
+                return css`
+                :host {
+                    color: #F538A0;
+                }
+
+                ul {
+                    list-style: none;
+                    padding: 0;
+                }
+
+                button {
+                    background-color: transparent;
+                }
+            
+                `;
+            }
+            static get properties() {
+                return {
+                    todos: { type: Array },
+                    loading: { type: Boolean }
+                };
+            }
+
+            constructor() {
+                super();
+                this.todos = [];
+            }
+
+            firstUpdated() {
+                this.loading = true;
+                fetch("https://swapi.dev/api/people/")
+                    .then((r) => r.json())
+                    .then((r) => {
+                        debugger
+                        this.todos = r.results.map((args) => {
+                            args['finished'] = args.gender == "male" ? true : false;
+                            args['text'] = args.name;
+                            return args;
+                            this.loading = false;
+                        });
+                    });
+            }
+            render() {
+                const finishedCount = this.todos.filter(e => e.finished).length;
+                const unfinishedCount = this.todos.length - finishedCount;
+
+                let buildList = html`<todo-list .todoList=${this.todos} @child-changeTodoStatus=${this.changeTodoStatus} @child-removeListItem=${this.removeListItem}></todo-list> `;
+                return html`
+                <h3> ${todoheading} </h3> 
+                 <input id="addTodoInput" placeholder="Name" />
+                 <button @click=${this.addNewItem}>Add</button>
+                 <button @click=${this.removeItem}>Remove All</button>
+                  ${buildList}
+                <div>Total finished: ${finishedCount}</div>
+                <div>Total unfinished: ${unfinishedCount}</div>
+                `;
+            }
+
+            addNewItem() {
+                const input = this.shadowRoot.getElementById('addTodoInput');
+                const inputText = input.value == '' ? "(empty)" : input.value;
+                input.value = '';
+                this.todos = [...this.todos, { text: inputText, finished: false }];
+                // update dom lit elements 
+                // this.requestUpdate();
+            }
+            removeItem() {
+                const input = this.shadowRoot.getElementById('addTodoInput');
+                const inputText = input.value;
+                this.todos = this.todos.filter((args) => {
+                    return args.text.trim().indexOf(inputText.trim()) == -1;
+                });
+                input.value = '';
+                // update dom lit elements or we can use properties 
+                // this.requestUpdate();
+            }
+            removeListItem(data) {
+                const inputText = data.detail.text;
+                this.todos = this.todos.filter((args) => {
+                    return args.text.trim().indexOf(inputText.trim()) == -1;
+                });
+            }
+            changeTodoStatus(args) {
+                // values from child 
+                const finished = args.detail.e.target.checked;
+                const inputText = args.detail.data.text;
+                this.todos = this.todos.map((args) => {
+                    if (args.text.trim() == (inputText.trim()))
+                        args.finished = finished;
+                    return args;
+                });
+            }
+        }
+        customElements.define('todo-app-stage3', TodoAPP2);
+
+        class TodoAppList extends LitElement {
+            static get properties() {
+                // values from parent
+                return { todoList: { type: Array } }
+            }
+            static get styles() {
+                return css`
+                .finished { color:green;}
+                .unfinished { color:red;}
+                `;
+            }
+            constructor() {
+                super();
+            }
+
+            render() {
+                if (this.todoList.length == 0)
+                    return html`<ul> No data avilable !! </ul>`
+                return html`<ul> ${this.todoList.map((data) => html`<li id=${data.text} class=${data.finished ? 'finished' : 'unfinished'}>  
+                     <input type="checkbox" for=${data.text} .checked=${data.finished} @change = ${e => this.changeTodoStatus(e, data)}/>
+                       ${data.text} - ${data.finished ? 'Finished' : 'Unfinished'}
+                         <button @click=${e => this.removeListItem(data)} style="padding:2px">X</button>
+                       </li>`)
+                    }
+                </ul> `
+            }
+
+            changeTodoStatus(e, data) {
+                //custom event to parent
+                this.dispatchEvent(new CustomEvent("child-changeTodoStatus", { detail: { e, data } }))
+            }
+            removeListItem(data) {
+                //custom event to parent
+                this.dispatchEvent(new CustomEvent("child-removeListItem", { detail: data }))
+            }
+        }
+        customElements.define('todo-list', TodoAppList);
+
+
+        class loadingIndicator extends LitElement {
+
+            render() {
+                return html`<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                        width="200px" height="200px" viewBox="0 0 200 200" enable-background="new 0 0 200 200" xml:space="preserve">
+                    <g>
+                        <path fill="none" stroke="#E51CB5" stroke-width="3" stroke-miterlimit="10" d="M138.768,100c0,21.411-17.356,38.768-38.768,38.768
+                            c-21.411,0-38.768-17.356-38.768-38.768c0-21.411,17.357-38.768,38.768-38.768"/>
+                        <animateTransform attributeType="xml" attributeName="transform" type="rotate" from="0 100 100" to="360 100 100" dur="8s" repeatCount="indefinite"/>
+                    </g>
+                    <g>
+                        <path fill="none" stroke="#C813E2" stroke-width="3" stroke-miterlimit="10" d="M132.605,100c0,18.008-14.598,32.605-32.605,32.605
+                            c-18.007,0-32.605-14.598-32.605-32.605c0-18.007,14.598-32.605,32.605-32.605"/>
+                        <animateTransform attributeType="xml" attributeName="transform" type="rotate" from="0 100 100" to="360 100 100" dur="4s" repeatCount="indefinite"/>
+                    </g>
+                    <g>
+                        <path fill="none" stroke="#9E31F4" stroke-width="3" stroke-miterlimit="10" d="M126.502,100c0,14.638-11.864,26.502-26.502,26.502
+                            c-14.636,0-26.501-11.864-26.501-26.502c0-14.636,11.865-26.501,26.501-26.501"/>
+                        <animateTransform attributeType="xml" attributeName="transform" type="rotate" from="0 100 100" to="360 100 100" dur="2s" repeatCount="indefinite"/>
+                    </g>
+                    <g>
+                        <path fill="none" stroke="#7847FC" stroke-width="3" stroke-miterlimit="10" d="M120.494,100c0,11.32-9.174,20.494-20.494,20.494
+                            c-11.319,0-20.495-9.174-20.495-20.494c0-11.319,9.176-20.495,20.495-20.495"/>
+                        <animateTransform attributeType="xml" attributeName="transform" type="rotate" from="0 100 100" to="360 100 100" dur="1s" repeatCount="indefinite"/>
+                    </g>
+                    </svg>`
+
+            }
+        }
+    </script>
+
+
+
+</body>
+
+</html>
