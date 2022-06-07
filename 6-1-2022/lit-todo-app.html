@@ -44,8 +44,21 @@
                 this.todos = [];
             }
 
+            /**
+            * The connectedCallback is called when the element is inserted to the DOM.
+            */
+            connectedCallback() {
+                super.connectedCallback();
+                console.log("connected!");
+            }
+            /**
+             * Called after the element's DOM has been updated the first time, immediately before updated()
+             * is called. This method can be useful for querying dom. Setting properties inside
+             * this method will trigger the element to update.
+             */
             firstUpdated() {
                 this.loading = true;
+                console.log("First updated!");
                 fetch("https://swapi.dev/api/people/")
                     .then((r) => r.json())
                     .then((r) => {
@@ -57,6 +70,32 @@
                         this.loading = false;
                     });
             }
+
+            /**
+             *  Implement to control if updating and rendering should occur when property values change or requestUpdate() is called.
+             */
+            shouldUpdate() {
+                console.log("should update!");
+                return true;
+            }
+            /**
+             * Implement to perform post-updating tasks via DOM APIs, for example, focusing an element.
+             * Setting properties inside this method will *not* trigger another update.
+             */
+            updated(changedProps) {
+                super.updated(changedProps);
+                console.log("updated!");
+            }
+
+            /**
+             * Invoked each time the custom element is disconnected from the document's DOM.
+             * Useful for running clean up code.
+             */
+            disconnectedCallback() {
+                console.log("disconnected!");
+                console.log(this.shadowRoot.querySelector("ul"));
+            }
+
             render() {
                 const finishedCount = this.todos.filter(e => e.finished).length;
                 const unfinishedCount = this.todos.length - finishedCount;
@@ -68,13 +107,11 @@
                 return html`<learning-details></learning-details>
                 <h3> ${todoheading} </h3> 
                  <div class="card">
-                
                  <input id="addTodoInput" placeholder="Name" />
                  <button @click=${this._addNewItem}>Add</button>
                  <button @click=${this._removeItem}>Remove All</button>
                   ${buildList}
-                  <div>Total finished: ${finishedCount}
-                 Total unfinished: ${unfinishedCount}</div>
+                  <todo-status>  <div slot='finishedstaus'>Total finished: ${finishedCount} Total unfinished: ${unfinishedCount}</div> </todo-status>
                </div> 
                 `;
             }
@@ -148,6 +185,7 @@
             render() {
                 if (this.todoList.length == 0)
                     return html`<ul> No data avilable !! </ul>`
+
                 return html`<ul> ${this.todoList.map((data) => html`<li id=${data.text} class=${data.finished ? 'finished' : 'unfinished'}>  
                      <input type="checkbox" for=${data.text} .checked=${data.finished} @change = ${e => this._changeTodoStatus(e, data)}/>
                        ${data.text} - ${data.finished ? 'Finished' : 'Unfinished'}
@@ -167,7 +205,12 @@
             }
         }
 
+        class TodoStatus extends LitElement {
 
+            render() {
+                return html`<slot name='finishedstaus'></slot>`
+            }
+        }
 
         class LoadingIndicator extends LitElement {
             render() {
@@ -205,7 +248,7 @@
             }
             constructor() {
                 super()
-                this.learnigList = ["Parent& child communication", "Properties", "Conditional rendering", "Custom events", "HTTP request", "Other web components", "Shared Syle", "Template"];
+                this.learnigList = ["Parent& child communication", "Properties", "Conditional rendering", "Custom events", "HTTP request", "Other web components", "Shared Syle", "Template", "Slot", "lifecycle"];
             }
 
             render() {
@@ -220,6 +263,7 @@
 
         customElements.define('todo-app-stage3', TodoAPP2);
         customElements.define('todo-list', TodoAppList);
+        customElements.define('todo-status', TodoStatus);
         customElements.define('loader-element', LoadingIndicator);
         customElements.define('learning-details', Learning);
 
