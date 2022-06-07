@@ -11,18 +11,27 @@
         import 'https://unpkg.com/@material/mwc-button?module';
 
         let todoheading = "Todo App";
-        //Stage 3
+        const sharedStyles = css`
+            :host {
+                color: black;
+            }
+            .card {
+                box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+                transition: 0.3s;
+                width: 25%;
+                padding:3em
+                }
+
+                .card:hover {
+                box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+                }
+            button {
+                background-color: transparent;
+            }`;
         class TodoAPP2 extends LitElement {
 
             static get styles() {
-                return css`
-                :host {
-                    color: #F538A0;
-                }
-                button {
-                    background-color: transparent;
-                }
-                `;
+                return sharedStyles;
             }
             static get properties() {
                 return {
@@ -40,7 +49,6 @@
                 fetch("https://swapi.dev/api/people/")
                     .then((r) => r.json())
                     .then((r) => {
-                        debugger
                         this.todos = r.results.map((args) => {
                             args['finished'] = args.gender == "male" ? true : false;
                             args['text'] = args.name;
@@ -52,19 +60,22 @@
             render() {
                 const finishedCount = this.todos.filter(e => e.finished).length;
                 const unfinishedCount = this.todos.length - finishedCount;
-                const buildList = html`<div class='mdc-card'><todo-list .todoList=${this.todos} @child-changeTodoStatus=${this._changeTodoStatus} @child-removeListItem=${this._removeListItem}></todo-list><div> `;
+                const buildList = html`<todo-list .todoList=${this.todos} @child-changeTodoStatus=${this._changeTodoStatus} @child-removeListItem=${this._removeListItem}></todo-list> `;
 
                 if (this.loading)
                     return html`<loader-element></loader-element>`
+
                 return html`<learning-details></learning-details>
                 <h3> ${todoheading} </h3> 
+                 <div class="card">
+                
                  <input id="addTodoInput" placeholder="Name" />
                  <button @click=${this._addNewItem}>Add</button>
                  <button @click=${this._removeItem}>Remove All</button>
                   ${buildList}
-                <div>Total finished: ${finishedCount}</div>
-                <div>Total unfinished: ${unfinishedCount}</div>
-                
+                  <div>Total finished: ${finishedCount}
+                 Total unfinished: ${unfinishedCount}</div>
+               </div> 
                 `;
             }
 
@@ -110,7 +121,7 @@
                 return { todoList: { type: Array } }
             }
             static get styles() {
-                return css`
+                return [sharedStyles, css`
                 .finished { color:green;}
                 .unfinished { color:red;}
                     ul {
@@ -127,9 +138,8 @@
                 .mdc-button {
                     height:22px;
                     width:22px;
-
                 }
-                `;
+                `];
             }
             constructor() {
                 super();
@@ -190,16 +200,19 @@
 
 
         class Learning extends LitElement {
+            static get styles() {
+                return [sharedStyles]
+            }
             constructor() {
                 super()
-                this.learnigList = ["Parent& child communication", "Properties", "Conditional rendering", "Custom events", "HTTP request", "Other web components"];
+                this.learnigList = ["Parent& child communication", "Properties", "Conditional rendering", "Custom events", "HTTP request", "Other web components", "Shared Syle", "Template"];
             }
 
             render() {
                 debugger
-                return html`<h3>Topics covered:</h3><ul> ${this.learnigList.map((data) => html`<li id=${data}>  
+                return html`<div class="card"> <h3>Topics covered:</h3><ul> ${this.learnigList.map((data) => html`<li id=${data}>  
                        ${data}
-                       </li>`)
+                       </li> </div>`)
                     }
                 </ul> `
             }
