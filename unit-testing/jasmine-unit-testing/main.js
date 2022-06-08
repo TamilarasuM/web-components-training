@@ -57,3 +57,13 @@ function updateResult(res) {
         document.getElementsByClassName("result")[0].innerHTML = res;
 }
 
+function showVersion() {
+    const calculator = new Calculator();
+    if (document.getElementById("version")) {
+        debugger
+        calculator.version.then((ver) => {
+            document.getElementById("version").innerHTML = ver;
+        });
+    }
+}
+

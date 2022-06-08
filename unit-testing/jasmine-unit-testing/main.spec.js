@@ -1,7 +1,7 @@
 describe("main.js", function () {
 
 
-    describe("UI methods functional validation", function () {
+    describe("Calculate -  functional validation", function () {
         it("calculate() add Validation", function () {
             let cal = new calculate("56+5");
             expect(61).toBe(cal.result);
@@ -39,6 +39,31 @@ describe("main.js", function () {
             expect(window.updateResult).toHaveBeenCalledWith(2)
         })
 
+        it("calls -  returnValue", function () {
+            spyOn(window, 'updateResult')
+            let spy = spyOn(Calculator.prototype, "div").and.returnValue("Custom value");
+            calculate("4/2")
+            expect(spy).toHaveBeenCalledTimes(1)
+            expect(window.updateResult).toHaveBeenCalledWith("Custom value")
+        })
+
+        it("calls - examples using  returnValue", function () {
+            spyOn(window, 'updateResult')
+            let spy = spyOn(Calculator.prototype, "div").and.returnValue("Custom value");
+            calculate("4/2")
+            expect(spy).toHaveBeenCalledTimes(1)
+            expect(window.updateResult).toHaveBeenCalledWith("Custom value")
+        })
+        it("calls - examples using  returnValues", function () {
+            spyOn(window, 'updateResult')
+            let spy = spyOn(Calculator.prototype, "div").and.returnValues("Custom value1", "Custom value2");
+            calculate("4/2")
+            calculate("4/4")
+            expect(spy).toHaveBeenCalledTimes(2)
+            expect(window.updateResult).toHaveBeenCalledWith("Custom value1")
+            expect(window.updateResult).toHaveBeenCalledWith("Custom value2")
+        })
+
     })
 
     describe("UI element validation - beforeEach, afterEach", function () {
@@ -67,7 +92,6 @@ describe("main.js", function () {
             expect(window.updateResult).toHaveBeenCalledTimes(2);
             // let UIValue = document.getElementsByClassName("result")[0].textContent;
             // expect(parseInt(UIValue)).toBe(cal.result);
-
         })
     })
 
@@ -98,4 +122,16 @@ describe("main.js", function () {
             expect(parseInt(UIValue)).toBe(cal.result);
         })
     })
+
+    // describe("Showversion() spyOnProperty", function () {
+    //     it("Calls version calculator ", function () {
+    //         spyOn(document, 'getElementById').and.returnValue(
+    //             { innnerText: null })
+    //         // spyOn(Calculator.prototype, 'version')
+    //         let spy = spyOnProperty(Calculator.prototype, "version", "get");
+    //         showVersion();
+    //         expect(spy).toHaveBeenCalled()
+    //     })
+
+    // })
 })
