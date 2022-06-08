@@ -9,14 +9,18 @@
     <link rel="stylesheet" href="./lib/jasmine-4.1.1/jasmine.css" />
 
     <script src="./calculator.js"></script>
-    <script src="./lib/jasmine-4.1.1/jasmine.js"></script>
+    <script src="./main.js"></script>
+    <!-- <script src="./lib/jasmine-4.1.1/jasmine.js"></script>
     <script src="./lib/jasmine-4.1.1/jasmine-html.js"></script>
     <script src="./lib/jasmine-4.1.1/boot0.js"></script>
-    <script src="./lib/jasmine-4.1.1/boot1.js"></script>
+    <script src="./lib/jasmine-4.1.1/boot1.js"></script> -->
 </head>
 
 <body>
-
+    <div style="margin: 0 auto;">
+        <input type="text" onkeyup="calculate(this.value)" />
+        <div>Result: <span class="result"></span></div>
+    </div>
 </body>
 
 </html>
