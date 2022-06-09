@@ -1,0 +1,24 @@
+{
+  "name": "jasmine-unit-testing",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "karma start"
+  },
+  "author": "Tamilarasu",
+  "license": "ISC",
+  "devDependencies": {
+    "istanbul": "^0.4.5",
+    "jasmine-core": "^4.1.1",
+    "karma": "^6.3.20",
+    "karma-chrome-launcher": "^3.1.1",
+    "karma-coverage": "^2.2.0",
+    "karma-jasmine": "^5.0.1",
+    "karma-jasmine-matchers": "^5.0.0",
+    "puppeteer": "^14.3.0"
+  }
+}

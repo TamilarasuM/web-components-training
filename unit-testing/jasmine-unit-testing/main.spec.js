@@ -125,6 +125,14 @@ describe("main.js", function () {
     })
 
     describe("Showversion()", function () {
+
+        it("fetches info from external Call", function (done) {
+            let calculator = new Calculator();
+            calculator.version.then(function (args) {
+                expect(args).toBe(1);
+                done();
+            })
+        })
         it("fetches info from external Call", function (done) {
             let calculator = new Calculator();
             calculator.version.then(function (args) {
