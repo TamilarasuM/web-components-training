@@ -97,6 +97,7 @@ describe("main.js", function () {
 
     describe("UI element validation - beforeAll, afterAll", function () {
         beforeAll(function () {
+
             element = document.createElement("div")
             element.setAttribute("class", "result");
             this.element = element;
@@ -123,15 +124,29 @@ describe("main.js", function () {
         })
     })
 
-    // describe("Showversion() spyOnProperty", function () {
-    //     it("Calls version calculator ", function () {
-    //         spyOn(document, 'getElementById').and.returnValue(
-    //             { innnerText: null })
-    //         // spyOn(Calculator.prototype, 'version')
-    //         let spy = spyOnProperty(Calculator.prototype, "version", "get");
-    //         showVersion();
-    //         expect(spy).toHaveBeenCalled()
-    //     })
+    describe("Showversion()", function () {
+        it("fetches info from external Call", function (done) {
+            let calculator = new Calculator();
+            calculator.version.then(function (args) {
+                expect(args).toBe(1);
+                done();
+            })
+        })
+        it("async & await fetches info from external Call", async function () {
+            let calculator = new Calculator();
+            spyOn(window, 'fetch').and.returnValue(Promise.resolve(new Response('{"id":1}')))
+            let version = await calculator.version;
+            expect(version).toBe(1);
+        })
+        it(" spyOn - fetches info from external Call", function (done) {
+            let calculator = new Calculator();
+            spyOn(window, 'fetch').and.returnValue(Promise.resolve(new Response('{"id":1}')))
+            calculator.version.then(function (version) {
+                expect(version).toBe(1);
+                done();
+            })
+        })
 
-    // })
+    })
+
 })
